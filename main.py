@@ -60,10 +60,10 @@ def initPlugin(plugin, autoImport=True):
 
         # Add command to list of commands and print a success message.
         Bot.commands.append(command)
-        print("Command `{}` registered successfully.".format(command.name))
+        #print("Command `{}` registered successfully.".format(command.name))
 
     # Print success message.
-    print("Plugin '{}' registered successfully.".format(plugin_info.name))
+    #print("Plugin '{}' registered successfully.".format(plugin_info.name))
 
 class FakeClient:
     def event(self):
