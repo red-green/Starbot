@@ -1,5 +1,5 @@
 from api import command, plugin, message
-import google
+from plugins.search import google
 import urllib
 
 # Search plugin
