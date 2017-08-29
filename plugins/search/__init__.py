@@ -22,4 +22,4 @@ async def onCommand(message_in):
 
     # Be kind, don't use lmgtfy/similar
     if message_in.command == 'google':
-        return message.Message(google.search(query))
+        return message.Message('{} {}'.format(google.search(query), query))
