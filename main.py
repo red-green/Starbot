@@ -24,26 +24,27 @@ from pluginbase import PluginBase
 from api import settings, message, logging
 from api import command as command_api
 from api.bot import Bot
-from libs import displayname
 
-def initPlugin(plugin, autoImport=True):
+def init_plugin(plugin_to_init, auto_import=True):
+    """Initializes a plugin by importing it, and then reading all commands
+    defined by it"""
     # Init plugin.
-    if autoImport == True:
-        plugin_temp = plugin_source.load_plugin(plugin)
+    if auto_import is True:
+        plugin_temp = PLUGIN_SOURCE.load_plugin(plugin_to_init)
         plugin_info = plugin_temp.onInit(plugin_temp)
     else:
-        plugin_info = plugin.onInit(plugin)
+        plugin_info = plugin_to_init.onInit(plugin_to_init)
 
     # Verify the plugin is defined, it has a name, and it has commands.
-    if plugin_info.plugin == None:
+    if plugin_info.plugin is None:
         print("Plugin not defined!")
-        pass
-    if plugin_info.name == None:
+        return
+    if plugin_info.name is None:
         print("Plugin name not defined")
-        pass
+        return
     if plugin_info.commands == []:
         print("Plugin did not define any commands.")
-        pass
+        return
 
     # Add plugin to list.
     Bot.plugins.append(plugin_info)
@@ -51,12 +52,12 @@ def initPlugin(plugin, autoImport=True):
     # Load each command in plugin.
     for command in plugin_info.commands:
         # Verify command has a parent plugin and a name.
-        if command.plugin == None:
+        if command.plugin is None:
             print("Plugin command does not define parent plugin")
-            pass
-        if command.name == None:
+            return
+        if command.name is None:
             print("Plugin command does not define name")
-            pass
+            return
 
         # Add command to list of commands and print a success message.
         Bot.commands.append(command)
@@ -66,7 +67,11 @@ def initPlugin(plugin, autoImport=True):
     print("Plugin '{}' registered successfully.".format(plugin_info.name))
 
 class FakeClient:
+    """A fake client to make the bot not reload itself any time a plugin
+    imports this main file. Ideally plugins should never import this
+    anyway."""
     def event(self):
+        """Stub function"""
         pass
 
 if __name__ == "__main__":
@@ -77,44 +82,44 @@ if __name__ == "__main__":
     Bot.startTime = time.time()
 
     # Get the source of plugins.
-    plugin_base = PluginBase(package="plugins")
-    plugin_source = plugin_base.make_plugin_source(searchpath=["./plugins"])
+    PLUGIN_BASE = PluginBase(package="plugins")
+    PLUGIN_SOURCE = PLUGIN_BASE.make_plugin_source(searchpath=["./plugins"])
 
     # Create the Discord client.
-    client = discord.Client()
-    Bot.client = client
+    CLIENT = discord.Client()
+    Bot.client = CLIENT
 
     # Load each plugin.
-    for plugin in plugin_source.list_plugins():
-        initPlugin(plugin)
+    for plugin in PLUGIN_SOURCE.list_plugins():
+        init_plugin(plugin)
 
     # Get our token to use.
-    token = ""
+    TOKEN = ""
     with open("token.txt") as m:
-        token = m.read().strip()
+        TOKEN = m.read().strip()
 else:
-    client = discord.Client()
-    Bot.client = client
+    CLIENT = discord.Client()
+    Bot.client = CLIENT
 
 
-@client.event
+@CLIENT.event
 async def on_ready():
+    """Called when Discord.py has finished preparing"""
     # Print logged in message to console.
     print("Logged in as")
-    print(client.user.name)
-    print(client.user.id)
+    print(CLIENT.user.name)
+    print(CLIENT.user.id)
     print("------")
 
     # Set the game.
-    await client.change_presence(game=discord.Game(name="with magic"))
+    await CLIENT.change_presence(game=discord.Game(name="with magic"))
 
 
-@client.event
+@CLIENT.event
 async def on_message(message_in):
-    # Ignore messages that aren't from a server and from ourself.
-    #if not message_in.server:
-     #   return
-    if message_in.author.id == client.user.id:
+    """Called any time a message occurs in a server"""
+    # Ignore messages that are from ourself or from another bot.
+    if message_in.author.id == CLIENT.user.id:
         return
     if message_in.author.bot:
         return

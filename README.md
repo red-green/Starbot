@@ -6,6 +6,9 @@
 <a href="https://discord.gg/JEYSJxn"><img src="https://img.shields.io/discord/302626068848705536.svg?style=flat-square" /></a>
 </h2>
 
+## Pep8 Compliance Branch
+This branch is going to be totally and completely broken. Don't try running this if you want a working bot.
+
 ## What's Starbot about?
 We have two goals for our bot: simple and powerful. The bot uses a plugin based system to allow you to write your own commands without ever touching the core of the bot. Just make a new file in the `plugins` folder and code away! We even have helpful APIs to handle databases, caching, and lots of other things for you. You can check these out [at our docs page.](http://starbot.readthedocs.io/en/latest/)
 
