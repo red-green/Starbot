@@ -165,7 +165,10 @@ async def on_message(message_in):
             message_recv.mentions = message_in.mentions
             message_recv.channel = message_in.channel
 
-            command_result = await command.plugin.onCommand(message_recv)
+            if command.customfunction != False:
+                command_result = await command.customfunction(message_recv)
+            else:
+                command_result = await command.plugin.onCommand(message_recv)
 
             # No message, error.
             if not command_result:

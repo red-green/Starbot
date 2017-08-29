@@ -48,7 +48,7 @@ async def onCommand(message_in):
         url = "https://search.aol.com/aol/search?q="
 
     # Form URL
-    url = '{}{}'.format(url, query)
+    url = '{} {}'.format(url, query)
 
     # Form and return message
     return message.Message('{} {}'.format(msg, url))
