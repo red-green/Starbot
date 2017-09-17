@@ -80,46 +80,6 @@ def onInit(plugin_in):
                                                  owners_command, messages_command, servers_command, invite_command, nickname_command, ping_command])
 
 async def onCommand(message_in):
-    if message_in.command == 'plugins':
-        plugin_list = []
-        for plugin_in in Bot.plugins:
-            plugin_list.append(plugin_in.name)
-        return message.Message(body='```{}```'.format(', '.join(plugin_list)))
-
-    if message_in.command == 'commands' or message_in.command == 'help':
-        cmd_names = []
-        cmd_descs = []
-        for botcommand in Bot.commands:
-            if botcommand.devcommand != True:
-                cmd_names.append(botcommand.name)
-                cmd_descs.append(botcommand.shortdesc)
-        cmd_list = []
-        pad_len = len(max(cmd_names, key=len))
-        for index, value in enumerate(cmd_names):
-            cmd_list.append('{} - {}'.format(cmd_names[index].ljust(pad_len), cmd_descs[index]))
-        return message.Message(body='```{}```'.format('\n'.join(cmd_list)))
-
-    if message_in.command == 'info':
-        sha = git.git_commit()
-        track = git.git_branch()
-        remote = git.get_remote()
-
-        if track == 'master':
-            embed = discord.Embed(color=discord.Color.red())
-        elif track == 'unstable':
-            embed = discord.Embed(color=discord.Color.gold())
-        elif track == 'stable':
-            embed = discord.Embed(color=discord.Color.green())
-        else:
-            embed = discord.Embed(color=discord.Color.light_grey())
-        embed.set_author(name='Project StarBot v0.2.0-{} on track {}'.format(sha[:7], track),
-                         url='https://github.com/1byte2bytes/Starbot/',
-                         icon_url='https://pbs.twimg.com/profile_images/616309728688238592/pBeeJQDQ.png')
-        embed.add_field(name="Bot Team Alpha", value="CorpNewt\nSydney Erickson\nGoldfish64")
-        embed.add_field(name="Source Code", value="Interested in poking around inside the bot?\nClick on the link above!")
-        embed.set_footer(text="Pulled from {}".format(remote))
-        return message.Message(embed=embed)
-
     if message_in.command == 'plugintree':
         dups = commands_detect_dups()
         plugin_string = '```\n'

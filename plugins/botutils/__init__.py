@@ -1,16 +1,20 @@
 from api import command, plugin
-from plugins.botutils import command_plugins, command_commands
+from plugins.botutils import command_plugins, command_info, command_commands
 
 def onInit(plugin_in):
     plugins_command    = command.Command(plugin_in, 'plugins', 
-    shortdesc='Print a list of plugins', devcommand=True, 
-    customfunction=command_plugins.run)
+        shortdesc='Print a list of plugins', devcommand=True, 
+        customfunction=command_plugins.run)
 
     commands_command   = command.Command(plugin_in, 'commands', 
-    shortdesc='Print a list of commands', customfunction=command_commands.run)
+        shortdesc='Print a list of commands', customfunction=command_commands.run)
     
-    help_command       = command.Command(plugin_in, 'help', shortdesc='Redirects to !commands')
-    info_command       = command.Command(plugin_in, 'info', shortdesc='Print some basic bot info')
+    help_command       = command.Command(plugin_in, 'help', 
+        shortdesc='Redirects to !commands', customfunction=command_commands.run)
+
+    info_command       = command.Command(plugin_in, 'info', 
+        shortdesc='Print some basic bot info', customfunction=command_info.run)
+
     plugintree_command = command.Command(plugin_in, 'plugintree', shortdesc='Print a tree of plugins and commands', devcommand=True)
     uptime_command     = command.Command(plugin_in, 'uptime', shortdesc='Print the bot\'s uptime', devcommand=True)
     hostinfo_command   = command.Command(plugin_in, 'hostinfo', shortdesc='Prints information about the bots home', devcommand=True)
