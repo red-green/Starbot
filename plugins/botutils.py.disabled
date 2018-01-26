@@ -12,32 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import math
-import os
-import platform
-import sys
-import time
-
-import discord
-import psutil
-import pyspeedtest
-
-from api import settings, logging, command, message, plugin, git
-from api.bot import Bot
-from libs import progressBar, readableTime, displayname
-
 # Command names.
 SERVERSCMD = "servers"
 NICKNAMECMD = "nickname"
 
 def onInit(plugin_in):
-    plugins_command    = command.Command(plugin_in, 'plugins', shortdesc='Print a list of plugins', devcommand=True)
-    commands_command   = command.Command(plugin_in, 'commands', shortdesc='Print a list of commands')
-    help_command       = command.Command(plugin_in, 'help', shortdesc='Redirects to !commands')
-    info_command       = command.Command(plugin_in, 'info', shortdesc='Print some basic bot info')
-    plugintree_command = command.Command(plugin_in, 'plugintree', shortdesc='Print a tree of plugins and commands', devcommand=True)
-    uptime_command     = command.Command(plugin_in, 'uptime', shortdesc='Print the bot\'s uptime', devcommand=True)
-    hostinfo_command   = command.Command(plugin_in, 'hostinfo', shortdesc='Prints information about the bots home', devcommand=True)
     cpuinfo_command    = command.Command(plugin_in, 'cpuinfo', shortdesc='Prints info about the system CPUs', devcommand=True)
     setprefix_command  = command.Command(plugin_in, 'setprefix', shortdesc='Set the server prefix', devcommand=True)
     getprefix_command  = command.Command(plugin_in, 'getprefix', shortdesc='Get the server prefix', devcommand=True)
@@ -54,15 +33,6 @@ def onInit(plugin_in):
                                                  owners_command, messages_command, servers_command, invite_command, nickname_command, ping_command])
 
 async def onCommand(message_in):
-    if message_in.command == 'plugintree':
-        
-
-    if message_in.command == 'uptime':
-        
-
-    if message_in.command == 'hostinfo':
-
-
     if message_in.command == 'cpuinfo':
         # Get CPU usage and create string for message.
         cpu_pcts = psutil.cpu_percent(interval=0.1, percpu=True)
