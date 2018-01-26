@@ -30,23 +30,6 @@ from libs import progressBar, readableTime, displayname
 SERVERSCMD = "servers"
 NICKNAMECMD = "nickname"
 
-def commands_detect_dups():
-    duplicates = []
-    commands_list = []
-    for plugin_in in Bot.plugins:
-        for command_in in plugin_in.commands:
-            commands_list.append(command_in.name)
-
-    for command_in in commands_list:
-        commandOccurances = 0
-        for command2 in commands_list:
-            if command_in == command2:
-                commandOccurances += 1
-        if commandOccurances > 1:
-            duplicates.append(command_in)
-
-    return list(set(duplicates))
-
 def convert_size(size_bytes):
     if size_bytes == 0:
         return '0B'
@@ -81,26 +64,7 @@ def onInit(plugin_in):
 
 async def onCommand(message_in):
     if message_in.command == 'plugintree':
-        dups = commands_detect_dups()
-        plugin_string = '```\n'
-        for plugin_in in Bot.plugins:
-            plugin_string += '{}\n'.format(plugin_in.name)
-            plugin_commands = len(plugin_in.commands)
-            index = 0
-            for command_in in plugin_in.commands:
-                index += 1
-                if plugin_commands != index:
-                    if command_in.name in dups:
-                        plugin_string += '├ {} <-- duplicate\n'.format(command_in.name)
-                    else:
-                        plugin_string += '├ {}\n'.format(command_in.name)
-                else:
-                    if command_in.name in dups:
-                        plugin_string += '└ {} <-- duplicate\n'.format(command_in.name)
-                    else:
-                        plugin_string += '└ {}\n'.format(command_in.name)
-        plugin_string += '```'
-        return message.Message(body=plugin_string)
+        
 
     if message_in.command == 'uptime':
         time_current = int(time.time())
