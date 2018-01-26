@@ -67,9 +67,7 @@ async def onCommand(message_in):
         
 
     if message_in.command == 'uptime':
-        time_current = int(time.time())
-        time_str = readableTime.getReadableTimeBetween(Bot.startTime, time_current)
-        return message.Message(body='I\'ve been up for *{}*.'.format(time_str))
+        
 
     if message_in.command == 'hostinfo':
         # Get information about host environment.

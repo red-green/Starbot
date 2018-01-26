@@ -1,6 +1,6 @@
 from api import command, plugin
 from plugins.botutils import command_plugins, command_info, command_commands
-from plugins.botutils import command_plugintree
+from plugins.botutils import command_plugintree, command_uptime
 
 def onInit(plugin_in):
     plugins_command    = command.Command(plugin_in, 'plugins', 
@@ -20,7 +20,11 @@ def onInit(plugin_in):
         shortdesc='Print a tree of plugins and commands', devcommand=True,
         customfunction=command_plugintree.run)
 
-    uptime_command     = command.Command(plugin_in, 'uptime', shortdesc='Print the bot\'s uptime', devcommand=True)
+    uptime_command     = command.Command(plugin_in, 'uptime', 
+        shortdesc='Print the bot\'s uptime', devcommand=True,
+        customfunction=command_uptime.run)
+
+
     hostinfo_command   = command.Command(plugin_in, 'hostinfo', shortdesc='Prints information about the bots home', devcommand=True)
     cpuinfo_command    = command.Command(plugin_in, 'cpuinfo', shortdesc='Prints info about the system CPUs', devcommand=True)
     setprefix_command  = command.Command(plugin_in, 'setprefix', shortdesc='Set the server prefix', devcommand=True)
