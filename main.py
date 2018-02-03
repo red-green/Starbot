@@ -20,72 +20,28 @@ import asyncio
 import discord
 from pluginbase import PluginBase
 
-from api import settings, message, logging
+from api import settings, message, logging, commandmanager
 from api import command as command_api
 from api.bot import Bot
 from libs import displayname
+from api import database
 
-def initPlugin(plugin, autoImport=True):
-	# Init plugin.
-	if autoImport == True:
-		plugin_temp = plugin_source.load_plugin(plugin)
-		plugin_info = plugin_temp.onInit(plugin_temp)
-	else:
-		plugin_info = plugin.onInit(plugin)
 
-	# Verify the plugin is defined, it has a name, and it has commands.
-	if plugin_info.plugin == None:
-		print("Plugin not defined!")
-		pass
-	if plugin_info.name == None:
-		print("Plugin name not defined")
-		pass
-	if plugin_info.commands == []:
-		print("Plugin did not define any commands.")
-		pass
-
-	# Add plugin to list.
-	Bot.plugins.append(plugin_info)
-
-	# Load each command in plugin.
-	for command in plugin_info.commands:
-		# Verify command has a parent plugin and a name.
-		if command.plugin == None:
-			print("Plugin command does not define parent plugin")
-			pass
-		if command.name == None:
-			print("Plugin command does not define name")
-			pass
-
-		# Add command to list of commands and print a success message.
-		Bot.commands.append(command)
-		print("Command `{}` registered successfully.".format(command.name))
-
-	# Print success message.
-	print("Plugin '{}' registered successfully.".format(plugin_info.name))
-
-class FakeClient:
+class FakeClient: # what is this for?
 	def event(self):
 		pass
 
 if __name__ == "__main__":
-	from api import database
 	database.init()
 
 	# Log the time we started.
 	Bot.startTime = time.time()
 
-	# Get the source of plugins.
-	plugin_base = PluginBase(package="plugins")
-	plugin_source = plugin_base.make_plugin_source(searchpath=["./plugins"])
-
 	# Create the Discord client.
 	client = discord.Client()
 	Bot.client = client
 
-	# Load each plugin.
-	for plugin in plugin_source.list_plugins():
-		initPlugin(plugin)
+	commandmanager.load_all_plugins()
 
 	# Get our token to use.
 	token = ""
@@ -120,69 +76,43 @@ async def on_message(message_in):
 	if message_in.author.bot:
 		return
 
-	is_command = False
+	# Send typing message.
+	await client.send_typing(message_in.channel)
 
-	# Get prefix. If not on a server, no prefix is needed.
-	#logging.message_log(message_in, message_in.server.id)
-	if message_in.server:
-		prefix = settings.prefix_get(message_in.server.id)
-		me = message_in.server.me
+	# Build message object.
+	message_recv = message.Message
+	message_recv.command = command.name
+	if message_in.content.startswith("{} ".format(me.mention)):
+		message_recv.body = message_in.content.split("{} ".format(me.mention) + command.name, 1)[1]
 	else:
-		prefix = ""
-		me = message_in.channel.me
+		message_recv.body = message_in.content.split(prefix + command.name, 1)[1]
+	message_recv.author = message_in.author
+	message_recv.server = message_in.server
+	message_recv.mentions = message_in.mentions
+	message_recv.channel = message_in.channel
 
-	# Check each command loaded.
-	for command in Bot.commands:
-		# Do we have a command?
-		if command_api.is_command(message_in, prefix, command):
-			# Prevent message count increment.
-			is_command = True
+	resp = await commandmanager.parse_command(message_recv)
+	is_command = resp != None
 
-			# Send typing message.
-			await client.send_typing(message_in.channel)
+	if type(command_result) is list and len(command_result) > 5:  # PM messages.
+		# Send message saying that we are PMing the messages.
+		await client.send_message(message_in.channel, "Because the output of that command is **{} pages** long, I'm just going to PM the result to you.".format(len(command_result)))
 
-			# Build message object.
-			message_recv = message.Message
-			message_recv.command = command.name
-			if message_in.content.startswith("{} ".format(me.mention)):
-				message_recv.body = message_in.content.split("{} ".format(me.mention) + 
-															 command.name, 1)[1]
-			else:
-				message_recv.body = message_in.content.split(prefix + command.name, 1)[1]
-			message_recv.author = message_in.author
-			message_recv.server = message_in.server
-			message_recv.mentions = message_in.mentions
-			message_recv.channel = message_in.channel
+		# PM it.
+		for item in command_result:
+			await process_message(message_in.author, message_in, item)
 
-			command_result = await command.plugin.onCommand(message_recv)
+	else: # Send to channel.
+		for item in command_result:
+			await process_message(message_in.channel, message_in, item)
 
-			# No message, error.
-			if not command_result:
-				await client.send_message(message_in.channel,
-										  "**Beep boop - Something went wrong!**\n_Command did not return a result._")
+	# Do regular message.
+	else:
+		await process_message(message_in.channel, message_in, command_result)
 
-			# Do list of messages, one after the other. If the message is more than 5 chunks long, PM it.
-			elif type(command_result) is list:
-				if len(command_result) > 5:  # PM messages.
-					# Send message saying that we are PMing the messages.
-					await client.send_message(message_in.channel,
-											  "Because the output of that command is **{} pages** long, I'm just going to PM the result to you.".format(len(command_result)))
-
-					# PM it.
-					for item in command_result:
-						await process_message(message_in.author, message_in, item)
-
-				else: # Send to channel.
-					for item in command_result:
-						await process_message(message_in.channel, message_in, item)
-
-			# Do regular message.
-			else:
-				await process_message(message_in.channel, message_in, command_result)
-
-				# Do we delete the message afterwards?
-				if message_in.server and command_result.delete:
-					await client.delete_message(message_in)
+		# Do we delete the message afterwards?
+		if message_in.server and command_result.delete:
+			await client.delete_message(message_in)
 
 	# Increment message counters if not command.
 	if message_in.server and not is_command:

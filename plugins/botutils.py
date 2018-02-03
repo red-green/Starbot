@@ -290,7 +290,7 @@ def nickname_cmd(message_in):
 	if message_in.channel.permissions_for(message_in.author).manage_nicknames:
 		# Change nickname.
 		await Bot.client.change_nickname(message_in.server.me, message_in.body.strip())
-	   # if message_in.server.me.nick:
+		# if message_in.server.me.nick:
 		#    return message.Message("My new nickname in this server is **{}**".format(message_in.server.me.nick))
 		#else:
 		 #   return message.Message("My nickname has been removed.")
@@ -311,7 +311,7 @@ def cachecont_cmd(message_in):
 
 ############################ initialization afterward so we can reference those functions
 
-def onInit(plugin_in):
+def init(plugin_in):
 	global this_plugin
 
 	commands_list = [
@@ -338,6 +338,4 @@ def onInit(plugin_in):
 	this_plugin = plugin.Plugin(plugin_in, 'botutils', commands_list)
 	return this_plugin
 
-async def onCommand(message_in):
-	return this_plugin.someting_somthing_parse_commands_blah_blah_blah(message_in)
 
