@@ -114,12 +114,6 @@ async def on_message(message_in):
 		if message_in.server and command_result.delete:
 			await client.delete_message(message_in)
 
-	# Increment message counters if not command.
-	if message_in.server and not is_command:
-		logging.message_log(message_in, message_in.server.id)
-		count = logging.message_count_get(message_in.server.id)
-		Bot.messagesSinceStart += 1
-		count += 1
 
 async def process_message(target, message_in, msg):
 	# If the message to send has a body

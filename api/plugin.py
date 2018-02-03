@@ -15,7 +15,8 @@
 
 class Plugin():
 	'''Store information about a plugin'''
-	def __init__(self, plugin, name, commands):
+	def __init__(self, plugin, name, commands, callback=None):
 		self.plugin = plugin
 		self.name = name
 		self.commands = commands
+		self.callback = callback

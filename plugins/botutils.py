@@ -266,19 +266,6 @@ def servers_cmd(message_in):
 	else:
 		return message.Message("I am a member of **{} servers**!".format(servercount))
 
-def messages_cmd(message_in):
-	# Get server.
-	server = message_in.server
-
-	# If the server is null, show error.
-	if not server:
-		return message.Message("This is not a server. :wink:")
-
-	msg_count = Bot.messagesSinceStart
-	msg_count_server = logging.message_count_get(server.id)
-	msg = "I've witnessed *{} messages* since I started and *{} messages* overall!"
-	return message.Message(msg.format(msg_count, msg_count_server))
-
 def invite_cmd(message_in):
 	class perm_admin:
 		value = 8
@@ -320,7 +307,6 @@ def init(plugin_in):
 		command.Command(plugin_in, 'speedtest', speedtest_cmd, shortdesc='Run a speedtest', devcommand=True),
 		command.Command(plugin_in, 'addowner', addowner_cmd, shortdesc='Add a bot owner', devcommand=True),
 		command.Command(plugin_in, 'owners', owners_cmd, shortdesc='Print the bot owners', devcommand=True),
-		command.Command(plugin_in, 'messages', messages_cmd, shortdesc="Show how many messages the bot has seen since start"),
 		command.Command(plugin_in, 'servers', servers_cmd, shortdesc="Show how many servers the bot is on"),
 		command.Command(plugin_in, 'invite', invite_cmd, shortdesc="Invite the bot to your server!"),
 		command.Command(plugin_in, 'nickname', nickname_cmd, shortdesc="Change the bot's nickname"),

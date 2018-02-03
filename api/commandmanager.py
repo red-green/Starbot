@@ -10,16 +10,20 @@ from command import is_command
 from pluginbase import PluginBase
 
 command_map = {}
+callbacks = []
 
 
 def load_plugin(plugin_source, plugin, autoimport=True):
-	global command_map
+	global command_map, callbacks
 
 	if autoimport == True:
 		plugin_temp = plugin_source.load_plugin(plugin)
 		plugin_info = plugin_temp.init(plugin_temp)
 	else:
 		plugin_info = plugin.init(plugin)
+
+	if plugin_info.callback:
+		callbacks.append(plugin_info.callback)
 
 	# Verify the plugin is defined, it has a name, and it has commands.
 	if plugin_info.plugin == None:
@@ -57,6 +61,7 @@ def load_all_plugins():
 
 
 def parse_command(message_in):
+
 	if message_in.server:
 		prefix = settings.prefix_get(message_in.server.id)
 		me = message_in.server.me
@@ -87,6 +92,9 @@ def parse_command(message_in):
 		cmd_class = command_map.get(cmd_string,None)
 		if not cmd_class:
 			has_cmd = False
+
+	for cb_func in callbacks:
+		cb_func(message_in, has_cmd)
 
 	if has_cmd:
 		message_in.args = cmd_args
