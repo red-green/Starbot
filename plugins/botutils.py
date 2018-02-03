@@ -29,7 +29,6 @@ from libs import progressBar, readableTime, displayname
 
 this_plugin = None
 
-
 def commands_detect_dups():
 	duplicates = []
 	commands_list = []

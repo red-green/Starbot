@@ -14,8 +14,8 @@
 '''Provides the plugin class'''
 
 class Plugin():
-    '''Store information about a plugin'''
-    def __init__(self, plugin, name, commands):
-        self.plugin = plugin
-        self.name = name
-        self.commands = commands
+	'''Store information about a plugin'''
+	def __init__(self, plugin, name, commands):
+		self.plugin = plugin
+		self.name = name
+		self.commands = commands
