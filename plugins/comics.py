@@ -40,7 +40,7 @@ def xkcd_cmd(message_in):
 
 def init(plugin_in):
 	commands_list = [
-		xkcd_command = command.Command(plugin_in, 'xkcd', xkcd_cmd, shortdesc='Posts the latest XKCD, or by specific ID')
+		command.Command(plugin_in, 'xkcd', xkcd_cmd, shortdesc='Posts the latest XKCD, or by specific ID')
 	]
 	return plugin.Plugin(plugin_in, 'comics', commands_list)
 

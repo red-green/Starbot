@@ -15,31 +15,32 @@
 import random
 from api import command, message, plugin
 
-def onInit(plugin_in):
-    '''List commands for plugin.'''
-    excuse_command = command.Command(plugin_in, 'excuse', shortdesc='Dish out excuses ;)')
-    return plugin.Plugin(plugin_in, 'excuses', [excuse_command])
 
-async def onCommand(message_in):
-    '''Run plugin commands.'''
-    if message_in.command == 'excuse':
-        # Give excuses
-        excuse_list = ["I have an appointment with a robot.",
-                       "I was abducted by robots.",
-                       "I didn’t know what day it was because I was looking at the Robotic Calendar.",
-                       "My robot threw up on my source code.",
-                       "I need to take my robot for a walk.",
-                       "I had to get a cybernetic head and couldn't get anything done.",
-                       "My Robot Assistant blue-screened.",
-                       "A kernel panic erased my work.",
-                       "Somebody used up the data limit watching YouTube."]
-        randexcuse = random.randint(0, len(excuse_list)-1)
+excuse_list = ["I have an appointment with a robot.",
+			   "I was abducted by robots.",
+			   "I didn’t know what day it was because I was looking at the Robotic Calendar.",
+			   "My robot threw up on my source code.",
+			   "I need to take my robot for a walk.",
+			   "I had to get a cybernetic head and couldn't get anything done.",
+			   "My Robot Assistant blue-screened.",
+			   "A kernel panic erased my work.",
+			   "Somebody used up the data limit watching YouTube."]
 
-        # Say sorry
-        sorry_list = ["Please excuse me,", "I'm sorry, but", "I hope you forgive me, because"]
-        randsorry = random.randint(0, len(sorry_list)-1)
+sorry_list = ["Please excuse me,", "I'm sorry, but", "I hope you forgive me, because"]
 
-        msg = '*{} {}*'.format(sorry_list[randsorry], excuse_list[randexcuse])
+def excuse_cmd(message_in):
+		randexcuse = random.choice(excuse_list)
+		randsorry = random.choice(sorry_list)
 
-        # Return newly constructed message
-        return message.Message(msg)
+		msg = '*{} {}*'.format(randsorry, randexcuse)
+
+		# Return newly constructed message
+		return message.Message(msg)
+
+#########################
+
+def init(plugin_in):
+	commands_list = [
+		command.Command(plugin_in, 'excuse', excuse_command, shortdesc='I couldn\'t write a good description because...')
+	]
+	return plugin.Plugin(plugin_in, 'excuses', commands_list)
