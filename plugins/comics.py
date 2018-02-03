@@ -17,29 +17,30 @@ import json
 from api import command, caching, message, plugin
 
 
-def onInit(plugin_in):
-    '''List commands for plugin.'''
-    xkcd_command = command.Command(plugin_in, 'xkcd', shortdesc='Posts the latest XKCD, or by specific ID')
-    return plugin.Plugin(plugin_in, 'comics', [xkcd_command])
+def xkcd_cmd(message_in):
+	if message_in.body:
+		try:
+			if int(message_in.body) < 0:
+				return message.Message(body="ID `{}` is not a valid ID".format(message_in.body))
+		except ValueError:
+			return message.Message(body='Input of `{}` is not a valid number'.format(message_in.body))
 
-async def onCommand(message_in):
-    '''Run plugin commands.'''
-    if message_in.command == 'xkcd':
-        if message_in.body:
-            try:
-                if int(message_in.body) < 0:
-                    return message.Message(body="ID `{}` is not a valid ID".format(message_in.body))
-            except ValueError:
-                return message.Message(body='Input of `{}` is not a valid number'.format(message_in.body))
+		data = json.loads(caching.json_get("https://xkcd.com/{}/info.0.json".format(message_in.body.strip()),
+										caller='xkcd',
+										name_custom='{}.json'.format(message_in.body.strip())))
+	else:
+		data = json.loads(caching.json_get("https://xkcd.com/info.0.json", caller='xkcd', save=False))
+		
+	caching.cache_download(data['img'], '{}.png'.format(data['num']), caller='xkcd')
 
-            data = json.loads(caching.json_get("https://xkcd.com/{}/info.0.json".format(message_in.body.strip()),
-                                              caller='xkcd',
-                                              name_custom='{}.json'.format(message_in.body.strip())))
-        else:
-            data = json.loads(caching.json_get("https://xkcd.com/info.0.json", caller='xkcd', save=False))
-            
-        caching.cache_download(data['img'], '{}.png'.format(data['num']), caller='xkcd')
+	return message.Message(body='**{}/{}/{} - {}**\n_{}_'.format(data['month'], data['day'], data['year'],
+																data['safe_title'], data['alt']),
+							file='cache/xkcd_{}.png'.format(data['num']))
 
-        return message.Message(body='**{}/{}/{} - {}**\n_{}_'.format(data['month'], data['day'], data['year'],
-                                                                     data['safe_title'], data['alt']),
-                               file='cache/xkcd_{}.png'.format(data['num']))
+
+def init(plugin_in):
+	commands_list = [
+		xkcd_command = command.Command(plugin_in, 'xkcd', xkcd_cmd, shortdesc='Posts the latest XKCD, or by specific ID')
+	]
+	return plugin.Plugin(plugin_in, 'comics', commands_list)
+
