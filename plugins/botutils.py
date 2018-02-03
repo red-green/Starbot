@@ -27,8 +27,6 @@ from api import settings, logging, command, message, plugin, git
 from api.bot import Bot
 from libs import progressBar, readableTime, displayname
 
-this_plugin = None
-
 def commands_detect_dups():
 	duplicates = []
 	commands_list = []
@@ -309,8 +307,6 @@ def quit_cmd(message_in):
 ############################ initialization afterward so we can reference those functions
 
 def init(plugin_in):
-	global this_plugin
-
 	commands_list = [
 		command.Command(plugin_in, 'plugins', plugins_cmd, shortdesc='Print a list of plugins', devcommand=True),
 		command.Command(plugin_in, 'commands', help_cmd, shortdesc='Print a list of commands', alt_commands=['help','listcommands']),

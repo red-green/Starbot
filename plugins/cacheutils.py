@@ -16,8 +16,6 @@
 import glob
 from api import command, message, plugin, bot
 
-this_plugin = None
-
 def cachecount_cmd(message_in):
 	if message_in.body == '':
 		return message.Message(body='No plugin specified')
@@ -43,12 +41,10 @@ def cachecont_cmd(message_in):
 #####################
 
 def init(plugin_in):
-	global this_plugin
-
 	commands_list = [
 		command.Command(plugin_in, 'cachecount', cachecount_cmd, shortdesc='Count the number of cached items for a command', devcommand=True),
 		command.Command(plugin_in, 'caches', caches_cmd, shortdesc='Count the number of cached items per command', devcommand=True),
-		command.Command(plugin_in, 'totalcache', cachecount_cmd, shortdesc='Count the number of cached items stored', devcommand=True),
+		command.Command(plugin_in, 'totalcache', totalcache_cmd, shortdesc='Count the number of cached items stored', devcommand=True),
 		command.Command(plugin_in, 'cachecontents', cachecont_cmd, shortdesc='List the content of the cache', devcommand=True)
 	]
 	this_plugin = plugin.Plugin(plugin_in, 'cacheutils', commands_list)
