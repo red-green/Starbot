@@ -16,32 +16,41 @@
 import glob
 from api import command, message, plugin, bot
 
+this_plugin = None
 
-def onInit(plugin_in):
-    '''List commands for plugin.'''
-    desc_base = 'Count the number of cached items '
-    desc_cachecount = desc_base + 'for a command'
-    desc_caches = desc_base + 'per command'
-    desc_totalcache = desc_base + 'stored'
-    cachecount_command = command.Command(plugin_in, 'cachecount', shortdesc=desc_cachecount, devcommand=True)
-    caches_command = command.Command(plugin_in, 'caches', shortdesc=desc_caches, devcommand=True)
-    totalcache_command = command.Command(plugin_in, 'totalcache', shortdesc=desc_totalcache, devcommand=True)
-    return plugin.Plugin(plugin_in, 'cacheutils', [cachecount_command, caches_command, totalcache_command])
+def cachecount_cmd(message_in):
+	if message_in.body == '':
+		return message.Message(body='No plugin specified')
+	return message.Message(body='```{}```'.format(len(glob.glob('cache/{}_*'.format(message_in.body.strip())))))
 
-async def onCommand(message_in):
-    '''Run plugin commands.'''
-    if message_in.command == 'cachecount':
-        if message_in.body == '':
-            return message.Message(body='No plugin specified')
-        return message.Message(body='```{}```'.format(len(glob.glob('cache/{}_*'.format(message_in.body.strip())))))
+def caches_cmd(message_in):
+	cache_str = ''
+	for cmd in bot.Bot.commands:
+		cmd_cache_size = len(glob.glob('cache/{}_*'.format(cmd.name)))
+		if cmd_cache_size > 0:
+			cache_str += '{} - {}\n'.format(cmd.name, cmd_cache_size)
+	return message.Message(body='```{}```'.format(cache_str))
 
-    if message_in.command == 'caches':
-        cache_str = ''
-        for cmd in bot.Bot.commands:
-            cmd_cache_size = len(glob.glob('cache/{}_*'.format(cmd.name)))
-            if cmd_cache_size > 0:
-                cache_str += '{} - {}\n'.format(cmd.name, cmd_cache_size)
-        return message.Message(body='```{}```'.format(cache_str))
+def totalcache_cmd(message_in):
+	return message.Message(body='```{}```'.format(len(glob.glob('cache/*'))))
 
-    if message_in.command == 'totalcache':
-        return message.Message(body='```{}```'.format(len(glob.glob('cache/*'))))
+def cachecont_cmd(message_in):
+	cacheCount = glob.glob("cache/{}_*".format(message_in.content.split(' ')[-1]))
+	cacheString = '\n'.join(cacheCount)
+	return message.Message("```{}```".format(cacheString))
+
+
+#####################
+
+def init(plugin_in):
+	global this_plugin
+
+	commands_list = [
+		command.Command(plugin_in, 'cachecount', cachecount_cmd, shortdesc='Count the number of cached items for a command', devcommand=True),
+		command.Command(plugin_in, 'caches', caches_cmd, shortdesc='Count the number of cached items per command', devcommand=True),
+		command.Command(plugin_in, 'totalcache', cachecount_cmd, shortdesc='Count the number of cached items stored', devcommand=True),
+		command.Command(plugin_in, 'cachecontents', cachecont_cmd, shortdesc='List the content of the cache', devcommand=True)
+	]
+	this_plugin = plugin.Plugin(plugin_in, 'cacheutils', commands_list)
+	return this_plugin
+

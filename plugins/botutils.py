@@ -304,10 +304,7 @@ def ping_cmd(message_in):
 def quit_cmd(message_in):
 	sys.exit(0)
 
-def cachecont_cmd(message_in):
-	cacheCount = glob.glob("cache/{}_*".format(message_in.content.split(' ')[-1]))
-	cacheString = '\n'.join(cacheCount)
-	return message.Message("```{}```".format(cacheString))
+
 
 ############################ initialization afterward so we can reference those functions
 
@@ -333,7 +330,6 @@ def init(plugin_in):
 		command.Command(plugin_in, 'nickname', nickname_cmd, shortdesc="Change the bot's nickname"),
 		command.Command(plugin_in, 'ping', ping_cmd, shortdesc='Pong!'),
 		command.Command(plugin_in, 'exit', quit_cmd, shortdesc='Shut down the bot', devcommand=True, alt_commands=['quit','shutdown']),
-		command.Command(plugin_in, 'cachecontents', cachecont_cmd, shortdesc='List the content of the cache (why is this a thing?)', devcommand=True),
 	]
 	this_plugin = plugin.Plugin(plugin_in, 'botutils', commands_list)
 	return this_plugin

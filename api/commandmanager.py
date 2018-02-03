@@ -89,6 +89,7 @@ def parse_command(message_in):
 			has_cmd = False
 
 	if has_cmd:
-		return cmd_class.function(cmd_args)
+		message_in.args = cmd_args
+		return cmd_class.function(message_in)
 	else:
 		return None
