@@ -17,37 +17,27 @@ from api.bot import Bot
 from api.database.table import Table, TableTypes
 from libs import displayname
 
-# Command names.
-SETWELCOMECMD = "setwelcome"
-
-def onInit(plugin_in):
-    setwelcome_command = command.Command(plugin_in, SETWELCOMECMD, shortdesc="Set the welcome message for the server.")
-    return plugin.Plugin(plugin_in, "greetings", [setwelcome_command])
 
 @Bot.client.event
 async def on_member_join(member):
-    # Welcome new user.
-    await Bot.client.send_message(member.server, content = "Welcome " + member.mention + " to **" + member.server.name + "**!")
+	# Welcome new user.
+	await Bot.client.send_message(member.server, content = "Welcome " + member.mention + " to **" + member.server.name + "**!")
 
 @Bot.client.event
 async def on_member_remove(member):
-    # Say goodbye to user.
-    await Bot.client.send_message(member.server, content = "Goodbye *" + displayname.name(member) + "*, **" + member.server.name + "** will miss you!")
-
-#@Bot.client.event
-#async def on_member_ban(member) :
-    # Announce ban.
-#    await Bot.client.send_message(member.server, content = displayname.name(member) + " got banned from **" + member.server.name + "**.")
-
-#@Bot.client.event
-#async def on_member_unban(server, user):
-    # Announce unban.
-#    await Bot.client.send_message(server, content = displayname.name(user) + " got unbanned from **" + server.name + "**.")
+	# Say goodbye to user.
+	await Bot.client.send_message(member.server, content = "Goodbye *" + displayname.name(member) + "*, **" + member.server.name + "** will miss you!")
 
 
-async def onCommand(message_in):
-    # Initialize database.
-    database.init()
-    table_greetings = Table("greetings", TableTypes.pServer)
+async def welcome_cmd(message_in):
+	# Initialize database.
+	database.init()
+	table_greetings = Table("greetings", TableTypes.pServer)
+	### NYI i guess
 
 
+def onInit(plugin_in):
+	commands_list = [
+		command.Command(plugin_in, "setwelcome", welcome_cmd, shortdesc="Set the welcome message for the server [NYI].")
+	]
+	return plugin.Plugin(plugin_in, "greetings", commands_list)

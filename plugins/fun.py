@@ -27,14 +27,15 @@ EATCMD = "eat"
 
 # Fun plugin
 def onInit(plugin_in):
-    '''List commands for plugin.'''
-    lenny_command = command.Command(plugin_in, LENNYCMD, shortdesc="Give some Lenny")
-    shrug_command = command.Command(plugin_in, SHRUGCMD, shortdesc="Shrug it off")
-    tableflip_command = command.Command(plugin_in, TABLEFLIPCMD, shortdesc="Flip a table")
-    fart_command = command.Command(plugin_in, FARTCMD, shortdesc="PrincessZoey :P")
-    beta_command = command.Command(plugin_in, BETACMD, shortdesc="Something went wrong™")
-    eat_command = command.Command(plugin_in, EATCMD, shortdesc="Eat someone or something")
-    return plugin.Plugin(plugin_in, "fun", [lenny_command, shrug_command, tableflip_command, fart_command, beta_command, eat_command])
+    commands_list = [
+        command.Command(plugin_in, LENNYCMD, shortdesc="Give some Lenny"),
+        command.Command(plugin_in, SHRUGCMD, shortdesc="Shrug it off"),
+        command.Command(plugin_in, TABLEFLIPCMD, shortdesc="Flip a table"),
+        command.Command(plugin_in, FARTCMD, shortdesc="PrincessZoey :P"),
+        command.Command(plugin_in, BETACMD, shortdesc="Something went wrong™"),
+        command.Command(plugin_in, EATCMD, shortdesc="Eat someone or something"),
+    ]
+    return plugin.Plugin(plugin_in, "fun", commands_list)
 
 async def onCommand(message_in):
     '''Run plugin commands.'''
