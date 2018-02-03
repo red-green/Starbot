@@ -16,6 +16,7 @@ import math
 import os
 import platform
 import sys
+import glob
 import time
 
 import discord
@@ -63,42 +64,7 @@ def plugins_cmd(message_in):
 		plugin_list.append(plugin_in.name)
 	return message.Message(body='```{}```'.format(', '.join(plugin_list)))
 
-
-############################ initialization afterward so we can reference those functions
-
-def onInit(plugin_in):
-	global this_plugin
-
-	plugins = [
-		command.Command(plugin_in, 'plugins', plugins_cmd, shortdesc='Print a list of plugins', devcommand=True),
-		command.Command(plugin_in, 'commands', shortdesc='Print a list of commands'),
-		command.Command(plugin_in, 'help', shortdesc='Redirects to !commands'),
-		command.Command(plugin_in, 'info', shortdesc='Print some basic bot info'),
-		command.Command(plugin_in, 'plugintree', shortdesc='Print a tree of plugins and commands', devcommand=True),
-		command.Command(plugin_in, 'uptime', shortdesc='Print the bot\'s uptime', devcommand=True),
-		command.Command(plugin_in, 'hostinfo', shortdesc='Prints information about the bots home', devcommand=True),
-		command.Command(plugin_in, 'cpuinfo', shortdesc='Prints info about the system CPUs', devcommand=True),
-		command.Command(plugin_in, 'setprefix', shortdesc='Set the server prefix', devcommand=True),
-		command.Command(plugin_in, 'getprefix', shortdesc='Get the server prefix', devcommand=True),
-		command.Command(plugin_in, 'speedtest', shortdesc='Run a speedtest', devcommand=True),
-		command.Command(plugin_in, 'addowner', shortdesc='Add a bot owner', devcommand=True),
-		command.Command(plugin_in, 'owners', shortdesc='Print the bot owners', devcommand=True),
-		command.Command(plugin_in, 'messages', shortdesc="Show how many messages the bot has seen since start"),
-		command.Command(plugin_in, 'servers', shortdesc="Show how many servers the bot is on"),
-		command.Command(plugin_in, 'invite', shortdesc="Invite the bot to your server!"),
-		command.Command(plugin_in, 'nickname', shortdesc="Change the bot's nickname"),
-		command.Command(plugin_in, 'ping', shortdesc='Pong!')
-		## todo: exit and cachecontents
-	]
-	this_plugin = plugin.Plugin(plugin_in, 'botutils', plugins)
-	return this_plugin
-
-async def onCommand(message_in):
-	return this_plugin.someting_somthing_parse_commands_blah_blah_blah(message_in)
-
-
-
-if message_in.command == 'commands' or message_in.command == 'help':
+def help_cmd(message_in):
 	cmd_names = []
 	cmd_descs = []
 	for botcommand in Bot.commands:
@@ -111,7 +77,7 @@ if message_in.command == 'commands' or message_in.command == 'help':
 		cmd_list.append('{} - {}'.format(cmd_names[index].ljust(pad_len), cmd_descs[index]))
 	return message.Message(body='```{}```'.format('\n'.join(cmd_list)))
 
-if message_in.command == 'info':
+def info_cmd(message_in):
 	sha = git.git_commit()
 	track = git.git_branch()
 	remote = git.get_remote()
@@ -132,7 +98,7 @@ if message_in.command == 'info':
 	embed.set_footer(text="Pulled from {}".format(remote))
 	return message.Message(embed=embed)
 
-if message_in.command == 'plugintree':
+def plugintree_cmd(message_in):
 	dups = commands_detect_dups()
 	plugin_string = '```\n'
 	for plugin_in in Bot.plugins:
@@ -154,12 +120,12 @@ if message_in.command == 'plugintree':
 	plugin_string += '```'
 	return message.Message(body=plugin_string)
 
-if message_in.command == 'uptime':
+def uptime_cmd(message_in):
 	time_current = int(time.time())
 	time_str = readableTime.getReadableTimeBetween(Bot.startTime, time_current)
 	return message.Message(body='I\'ve been up for *{}*.'.format(time_str))
 
-if message_in.command == 'hostinfo':
+def hostinfo_cmd(message_in):
 	# Get information about host environment.
 	time_current = int(time.time())
 
@@ -206,7 +172,7 @@ if message_in.command == 'hostinfo':
 	# Return completed message.
 	return message.Message(body=msg)
 
-if message_in.command == 'cpuinfo':
+def cpuinfo_cmd(message_in):
 	# Get CPU usage and create string for message.
 	cpu_pcts = psutil.cpu_percent(interval=0.1, percpu=True)
 	cpu_pct_str = '{}\n'.format(platform.processor())
@@ -235,7 +201,7 @@ if message_in.command == 'cpuinfo':
 	# Return completed message.
 	return message.Message(body='```{}```'.format(cpu_pct_str))
 
-if message_in.command == 'setprefix':
+def setprefix_cmd(message_in):
 	if settings.owners_check(message_in.author.id):
 		prefix = message_in.body.split(' ', 1)[-1]
 		settings.prefix_set(message_in.server.id, prefix)
@@ -243,10 +209,10 @@ if message_in.command == 'setprefix':
 	else:
 		return message.Message(body='Only my owner can set the prefix!')
 
-if message_in.command == 'getprefix':
+def getprefix_cmd(message_in):
 	return message.Message(body='Prefix is {}'.format(settings.prefix_get(message_in.server.id)))
 
-if message_in.command == 'speedtest':
+def speedtest_cmd(message_in):
 	if settings.owners_check(message_in.author.id):
 		speed = pyspeedtest.SpeedTest()
 		msg = '**Speed Test Results:**\n'
@@ -258,7 +224,7 @@ if message_in.command == 'speedtest':
 	else:
 		return message.Message(body='You do not have permisison to run a speedtest.')
 
-if message_in.command == "addowner":
+def addowner_cmd(message_in):
 	if settings.owners_get():
 		try:
 			if settings.owners_check(message_in.author.id):
@@ -280,7 +246,7 @@ if message_in.command == "addowner":
 		settings.owners_add(message_in.author.id)
 		return message.Message(body="You have successfully claimed yourself as the first owner!")
 
-if message_in.command == 'owners':
+def owners_cmd(message_in):
 	owners = []
 	if not settings.owners_get():
 		return message.Message(body='I have no owners')
@@ -293,7 +259,7 @@ if message_in.command == 'owners':
 	owner_list = ', '.join(owners)
 	return message.Message(body=owner_list)
 
-if message_in.command == SERVERSCMD:
+def servers_cmd(message_in):
 	# Get server count.
 	servercount = len(Bot.client.servers)
 
@@ -303,7 +269,7 @@ if message_in.command == SERVERSCMD:
 	else:
 		return message.Message("I am a member of **{} servers**!".format(servercount))
 
-if message_in.command == 'messages':
+def messages_cmd(message_in):
 	# Get server.
 	server = message_in.server
 
@@ -316,12 +282,12 @@ if message_in.command == 'messages':
 	msg = "I've witnessed *{} messages* since I started and *{} messages* overall!"
 	return message.Message(msg.format(msg_count, msg_count_server))
 
-if message_in.command == 'invite':
+def invite_cmd(message_in):
 	class perm_admin:
 		value = 8
 	return message.Message(body=discord.utils.oauth_url(Bot.client.user.id, perm_admin))
 
-if message_in.command == NICKNAMECMD:
+def nickname_cmd(message_in):
 	if message_in.channel.permissions_for(message_in.author).manage_nicknames:
 		# Change nickname.
 		await Bot.client.change_nickname(message_in.server.me, message_in.body.strip())
@@ -333,5 +299,46 @@ if message_in.command == NICKNAMECMD:
 	else:
 		return message.Message("You cannot change nicknames on this server.")
 
-if message_in.command == 'ping':
+def ping_cmd(message_in):
 	return message.Message(body='PONG! Bot is up!')
+
+def quit_cmd(message_in):
+	sys.exit(0)
+
+def cachecont_cmd(message_in):
+	cacheCount = glob.glob("cache/{}_*".format(message_in.content.split(' ')[-1]))
+	cacheString = '\n'.join(cacheCount)
+	return message.Message("```{}```".format(cacheString))
+
+############################ initialization afterward so we can reference those functions
+
+def onInit(plugin_in):
+	global this_plugin
+
+	commands_list = [
+		command.Command(plugin_in, 'plugins', plugins_cmd, shortdesc='Print a list of plugins', devcommand=True),
+		command.Command(plugin_in, 'commands', help_cmd, shortdesc='Print a list of commands', alt_commands=['help','listcommands']),
+		command.Command(plugin_in, 'info', info_cmd, shortdesc='Print some basic bot info'),
+		command.Command(plugin_in, 'plugintree', plugintree_cmd, shortdesc='Print a tree of plugins and commands', devcommand=True),
+		command.Command(plugin_in, 'uptime', uptime_cmd, shortdesc='Print the bot\'s uptime', devcommand=True),
+		command.Command(plugin_in, 'hostinfo', hostinfo_cmd, shortdesc='Prints information about the bots home', devcommand=True),
+		command.Command(plugin_in, 'cpuinfo', cpuinfo_cmd, shortdesc='Prints info about the system CPUs', devcommand=True),
+		command.Command(plugin_in, 'setprefix', setprefix_cmd, shortdesc='Set the server prefix', devcommand=True),
+		command.Command(plugin_in, 'getprefix', getprefix_cmd, shortdesc='Get the server prefix', devcommand=True),
+		command.Command(plugin_in, 'speedtest', speedtest_cmd, shortdesc='Run a speedtest', devcommand=True),
+		command.Command(plugin_in, 'addowner', addowner_cmd, shortdesc='Add a bot owner', devcommand=True),
+		command.Command(plugin_in, 'owners', owners_cmd, shortdesc='Print the bot owners', devcommand=True),
+		command.Command(plugin_in, 'messages', messages_cmd, shortdesc="Show how many messages the bot has seen since start"),
+		command.Command(plugin_in, 'servers', servers_cmd, shortdesc="Show how many servers the bot is on"),
+		command.Command(plugin_in, 'invite', invite_cmd, shortdesc="Invite the bot to your server!"),
+		command.Command(plugin_in, 'nickname', nickname_cmd, shortdesc="Change the bot's nickname"),
+		command.Command(plugin_in, 'ping', ping_cmd, shortdesc='Pong!'),
+		command.Command(plugin_in, 'exit', quit_cmd, shortdesc='Shut down the bot', devcommand=True, alt_commands=['quit','shutdown']),
+		command.Command(plugin_in, 'cachecontents', cachecont_cmd, shortdesc='List the content of the cache (why is this a thing?)', devcommand=True),
+	]
+	this_plugin = plugin.Plugin(plugin_in, 'botutils', commands_list)
+	return this_plugin
+
+async def onCommand(message_in):
+	return this_plugin.someting_somthing_parse_commands_blah_blah_blah(message_in)
+

@@ -12,7 +12,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import glob
 import importlib
 import time
 import sys
@@ -131,18 +130,6 @@ async def on_message(message_in):
 	else:
 		prefix = ""
 		me = message_in.channel.me
-
-
-	# Should we die? Check for exit command.
-	if message_in.content == prefix + "exit" or message_in.content == "{} exit".format(me.mention):
-		if settings.owners_check(message_in.author.id):
-			sys.exit(0)
-
-	# Check for cache contents command.
-	if message_in.content.startswith(prefix + "cachecontents") or message_in.content.startswith("{} cachecontents".format(me.mention)):
-		cacheCount = glob.glob("cache/{}_*".format(message_in.content.split(' ')[-1]))
-		cacheString = '\n'.join(cacheCount)
-		await client.send_message(message_in.channel, "```{}```".format(cacheString))
 
 	# Check each command loaded.
 	for command in Bot.commands:
