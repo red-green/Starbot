@@ -74,12 +74,14 @@ def parse_command(message_in):
 	cmd_string = ''
 	cmd_class = None
 	args = []
+	content = ''
 	has_cmd = False
 
 	if len(message_split) >= 1 and message_split[0].startswith(prefix):
 		cmd_string = message_split[0].replace(prefix,'',1)
 		if len(message_split) > 1:
 			args = message_split[1:]
+			content = message_in.content.split(' ',1)[1]
 		has_cmd = True
 
 	elif len(message_split) >= 2 and message_split[0] == me.mention:
@@ -98,6 +100,8 @@ def parse_command(message_in):
 
 	if has_cmd:
 		message_in.args = cmd_args
+		message_in.content = content
+		message_in.command = cmd_string
 		return cmd_class.function(message_in)
 	else:
 		return None

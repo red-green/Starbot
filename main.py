@@ -79,19 +79,7 @@ async def on_message(message_in):
 	# Send typing message.
 	await client.send_typing(message_in.channel)
 
-	# Build message object.
-	message_recv = message.Message
-	message_recv.command = command.name
-	if message_in.content.startswith("{} ".format(me.mention)):
-		message_recv.body = message_in.content.split("{} ".format(me.mention) + command.name, 1)[1]
-	else:
-		message_recv.body = message_in.content.split(prefix + command.name, 1)[1]
-	message_recv.author = message_in.author
-	message_recv.server = message_in.server
-	message_recv.mentions = message_in.mentions
-	message_recv.channel = message_in.channel
-
-	resp = await commandmanager.parse_command(message_recv)
+	resp = await commandmanager.parse_command(message_in)
 	is_command = resp != None
 
 	if type(command_result) is list and len(command_result) > 5:  # PM messages.

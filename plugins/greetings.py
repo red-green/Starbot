@@ -36,7 +36,7 @@ async def welcome_cmd(message_in):
 	### NYI i guess
 
 
-def onInit(plugin_in):
+def init(plugin_in):
 	commands_list = [
 		command.Command(plugin_in, "setwelcome", welcome_cmd, shortdesc="Set the welcome message for the server [NYI].")
 	]
