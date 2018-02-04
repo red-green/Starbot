@@ -63,14 +63,12 @@ async def on_ready():
 	print("------")
 
 	# Set the game.
-	await client.change_presence(game=discord.Game(name="with magic"))
+	await client.change_presence(game=discord.Game(name="with puppies"))
 
 
 @client.event
 async def on_message(message_in):
 	# Ignore messages that aren't from a server and from ourself.
-	#if not message_in.server:
-	 #   return
 	if message_in.author.id == client.user.id:
 		return
 	if message_in.author.bot:
